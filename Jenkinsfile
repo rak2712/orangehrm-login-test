@@ -12,9 +12,11 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Setup venv and Install Dependencies') {
             steps {
                 sh '''
+                python3 -m venv venv
+                . venv/bin/activate
                 pip install --upgrade pip
                 pip install -r requirements.txt
                 '''
@@ -23,7 +25,10 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh 'pytest --junitxml=test-results.xml'
+                sh '''
+                . venv/bin/activate
+                pytest --junitxml=test-results.xml
+                '''
             }
         }
     }
