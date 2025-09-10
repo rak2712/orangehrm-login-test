@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        PYTHONUNBUFFERED = 1
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -24,6 +20,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
+                export PATH=$HOME/.local/bin:$PATH
                 pytest --junitxml=test-results.xml
                 '''
             }
