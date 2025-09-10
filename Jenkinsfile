@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.10'
-        }
-    }
+    agent any
 
     environment {
         PYTHONUNBUFFERED = 1
@@ -27,7 +23,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh 'pytest'
+                sh 'pytest --junitxml=test-results.xml'
             }
         }
     }
