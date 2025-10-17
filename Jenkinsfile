@@ -20,6 +20,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
+                export DISPLAY=:0
                 export PATH=$HOME/.local/bin:$PATH
                 pytest --junitxml=test-results.xml
                 '''
