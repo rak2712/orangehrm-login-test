@@ -1,5 +1,14 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'selenium/standalone-chrome:latest'  // pre-built image with Chrome & chromedriver
+            args '-u root:root'  // run as root to install Python packages
+        }
+    }
+
+    environment {
+        PATH = "/usr/local/bin:$PATH"
+    }
 
     stages {
         stage('Checkout') {
@@ -8,18 +17,20 @@ pipeline {
             }
         }
 
-        stage('Run Tests in Docker') {
+        stage('Install Dependencies') {
             steps {
                 sh '''
-                # Pull python image
-                docker pull python:3.12-slim
-
-                # Run tests inside container
-                docker run --rm -v $PWD:/app -w /app python:3.12-slim /bin/bash -c "
-                    pip install --upgrade pip
+                    python3 -m pip install --upgrade pip
                     pip install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh '''
+                    export DISPLAY=:99
                     pytest --junitxml=test-results.xml
-                "
                 '''
             }
         }
@@ -31,3 +42,4 @@ pipeline {
         }
     }
 }
+
