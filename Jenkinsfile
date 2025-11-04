@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.12' // official Python image
-            args '-v $HOME/.cache/pip:/root/.cache/pip'
-        }
-    }
+    agent any
 
     stages {
         stage('Checkout') {
@@ -13,19 +8,19 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Run Tests in Docker') {
             steps {
                 sh '''
-                python --version
-                pip install --upgrade pip
-                pip install -r requirements.txt
-                '''
-            }
-        }
+                # Pull python image
+                docker pull python:3.12-slim
 
-        stage('Run Tests') {
-            steps {
-                sh 'pytest --junitxml=test-results.xml'
+                # Run tests inside container
+                docker run --rm -v $PWD:/app -w /app python:3.12-slim /bin/bash -c "
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                    pytest --junitxml=test-results.xml
+                "
+                '''
             }
         }
     }
