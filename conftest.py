@@ -5,7 +5,7 @@ from selenium.webdriver.chrome.options import Options
 @pytest.fixture(scope="function")
 def driver():
     options = Options()
-    options.add_argument("--headless")  # Run in headless mode for CI
+    # options.add_argument("--headless")  # Run in headless mode for CI
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     driver = webdriver.Chrome(options=options)
