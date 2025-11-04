@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        PATH = "$HOME/.local/bin:$PATH"
+        PATH = "$HOME/.local/bin:/usr/local/bin:$PATH"
         DISPLAY = ":0"
     }
 
@@ -13,7 +13,7 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Install Python Dependencies') {
             steps {
                 sh '''
                     python3 -m pip install --upgrade pip --break-system-packages
@@ -22,10 +22,10 @@ pipeline {
             }
         }
 
-        stage('Install Chrome & ChromeDriver if Needed') {
+        stage('Install Chrome & ChromeDriver') {
             steps {
                 sh '''
-                    # Check if Google Chrome is installed
+                    # --- Install Google Chrome if missing ---
                     if ! command -v google-chrome &> /dev/null; then
                         echo "Google Chrome not found. Installing..."
                         wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -35,10 +35,10 @@ pipeline {
                         echo "Google Chrome is already installed"
                     fi
 
-                    # Check ChromeDriver version
+                    # --- Install ChromeDriver if missing ---
                     if ! command -v chromedriver &> /dev/null; then
                         echo "ChromeDriver not found. Installing..."
-                        CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+')
+                        CHROME_VERSION=$(google-chrome --version | grep -oP '\\d+\\.\\d+\\.\\d+')
                         wget -N https://chromedriver.storage.googleapis.com/$CHROME_VERSION/chromedriver_linux64.zip
                         unzip chromedriver_linux64.zip
                         sudo mv chromedriver /usr/local/bin/
@@ -51,7 +51,7 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
+        stage('Run Selenium Tests with GUI') {
             steps {
                 sh '''
                     echo "Running Selenium tests with DISPLAY=$DISPLAY"
