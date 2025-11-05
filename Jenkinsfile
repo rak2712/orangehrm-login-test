@@ -56,7 +56,7 @@ pipeline {
 
     post {
         always {
-            # Archive test results
+            // Archive test results
             junit '**/test-results.xml'
         }
     }
