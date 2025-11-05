@@ -14,10 +14,10 @@ pipeline {
                 # Add the Jenkins public GPG key to trusted keys
                 curl -fsSL https://pkg.jenkins.io/keys/jenkins.io.key | sudo tee /etc/apt/trusted.gpg.d/jenkins.asc
                 
-                # Update the package list
+                # Update package list
                 sudo apt-get update
                 
-                # Install necessary system dependencies
+                # Install system dependencies
                 sudo apt-get install -y \
                     unzip curl \
                     fonts-liberation libappindicator3-1 libasound2 libatk-bridge2.0-0 \
@@ -56,8 +56,14 @@ pipeline {
 
     post {
         always {
-            // Archive test results
-            junit '**/test-results.xml'
+            script {
+                // Check if the test results file exists before archiving
+                if (fileExists('test-results.xml')) {
+                    junit '**/test-results.xml'
+                } else {
+                    echo 'No test results found, skipping archiving.'
+                }
+            }
         }
     }
 }
